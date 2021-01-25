@@ -1,4 +1,5 @@
 import random
+import numpy as np
 #Using reals, such as 1.0 and 0.0
 
 def calculating_size(sizeArray, particles, n, m):
@@ -39,7 +40,18 @@ def calculating_fitness(particle, n, m, weights):
                 fitness = fitness + weights[j]
         totalFitness = totalFitness + fitness
     return totalFitness
-        
+
+def calculating_gBest(particle, optimumvalue, swarmSize):
+    differenceArray = []
+    for i in range(0,swarmSize):
+        differenceArray.append(particle[i][1])
+
+    #print(differenceArray)
+    differenceArray = np.asarray(differenceArray)
+    gBestIndex = (np.abs(differenceArray - optimumvalue)).argmin()
+    gBest = particle[gBestIndex]
+    return gBest
+         
 def main():
     #Read information from text files into variables.
     #Currently only doing for two knapsacks.
@@ -64,7 +76,7 @@ def main():
         z = 0
         y = m
         while y <= len(sizesArray):
-            finalsizesArray.append(sizesArray[z:][:m])
+            finalsizesArray.append(sizesArray[z:][:y])
             z = z + m
             y = y + m
             
@@ -79,8 +91,10 @@ def main():
     particleData = []
     finalParticleData = []
 
+    swarmSize = 10
+
     for i in range(0,n):
-        for j in range(0,10):
+        for j in range(0,swarmSize):
             particle = []
             finalParticle = []
                 
@@ -116,19 +130,14 @@ def main():
 
     #Calculate original sizes of each particle.
     particleSizeArray = []
-    for i in range(0,10):
+    for i in range(0,swarmSize):
         particleSizeArray.append(calculating_size(finalsizesArray, finalParticleData[i], n, m))
-
-    #print(particleSizeArray[0])
     
     #Now we have calculated the size of each variable, we need a function to get the sizes to
     #the capacity, if they are above the capacity.
 
-    for i in range(0,10):
+    for i in range(0,swarmSize):
         particleSizeArray[i] = meeting_capacity(particleSizeArray[i], finalParticleData[i], n, m, capacitiesArray, finalsizesArray)
-        
-    #print(particleSizeArray)
-    #print(finalParticleData)
 
     #I now have 10 particles that contain knapsacks filled to there capacities.
     #I will now calculate the fitness of each knapsack and the fitnesses of each particle.
@@ -139,6 +148,37 @@ def main():
 
     #print(particleFitnesses)
     
-    #I now have the fitnesses of 10 particles.
+    #Creating velocity/position/pBest and gBest.
+    velocity = []
+    position = []
+    pBest = []
+    Vmax = 20.0
+
+    #Adding all fitnesses as pBest currently due to initialization.
+    for i in range(0,swarmSize):
+        pBestParticle = [finalParticleData[i], particleFitnesses[i]]
+        pBest.append(pBestParticle)
+
+    #print(pBest)
+    #Randomly generate velocities and positions.
+    for i in range(0,swarmSize):
+        velocity.append(random.uniform(0.0, 20.0))
+        position.append(random.uniform(0.0, 20.0))
+
+    #print(velocities)
+    #print(positions)
+
+    #Appending all data to one final array for simple use. (Might not use this).
+    particleArray = []
+    for i in range(0,swarmSize):
+        appendingData = [finalParticleData[i], particleFitnesses[i], velocity[i], position[i]]
+        particleArray.append(appendingData)
+
+    #Adding all fitnesses as pBest currently due to initialization.
+    pBest = particleArray
+
+    gBest = calculating_gBest(pBest, optimumValue, swarmSize)
+    print(gBest)
+
 
 main()
