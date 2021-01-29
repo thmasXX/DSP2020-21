@@ -51,8 +51,16 @@ def calculating_gBest(particle, optimumvalue, swarmSize):
     gBestIndex = (np.abs(differenceArray - optimumvalue)).argmin()
     gBest = particle[gBestIndex]
     return gBest
+
+def comparing_two_particles(particlefit, optimumValue):
+    print(particlefit)
+    print(optimumValue)
+    particlefitnesses = np.asarray(particlefit)
+    pBestIndex = (np.abs(particlefitnesses - optimumValue)).argmin()
+    print(pBestIndex)
+    return pBestIndex
          
-def main():
+def initialization():
     #Read information from text files into variables.
     #Currently only doing for two knapsacks.
     with open('data.txt','r') as reader:
@@ -126,8 +134,6 @@ def main():
 
     #Now, I have a particle array, contiaining 10 elements, within those elements are two knapsacks.
 
-    #print(finalParticleData)
-
     #Calculate original sizes of each particle.
     particleSizeArray = []
     for i in range(0,swarmSize):
@@ -152,7 +158,8 @@ def main():
     velocity = []
     position = []
     pBest = []
-    Vmax = 20.0
+    Vmax = 2.0
+    Vmin = -2.0
 
     #Adding all fitnesses as pBest currently due to initialization.
     for i in range(0,swarmSize):
@@ -162,8 +169,8 @@ def main():
     #print(pBest)
     #Randomly generate velocities and positions.
     for i in range(0,swarmSize):
-        velocity.append(random.uniform(0.0, 20.0))
-        position.append(random.uniform(0.0, 20.0))
+        velocity.append(random.uniform(Vmin, Vmax))
+        position.append(random.uniform(0.0, 4.0))
 
     #print(velocities)
     #print(positions)
@@ -178,7 +185,81 @@ def main():
     pBest = particleArray
 
     gBest = calculating_gBest(pBest, optimumValue, swarmSize)
-    print(gBest)
+    #print(gBest)
+
+    pso(particleArray, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, finalsizesArray, capacitiesArray, weightsArray)
+
+def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, sizeArray, capacity, weights):
+    #Initialize generations and newGeneration array which replaces population after every generation.
+    GENS = 1
+    newpopulation = population
+    #if data is changed within new population during the generation where the solution is not feasible
+    #data will replaced with the original "population" data, this population data will be overwritten with the
+    #newPopulation data every generation.
+
+    condition = 0
+
+    #particle data = 0, fitness = 1, velocity = 2, pos = 3
+
+    #Until condition has been met, in every generation, we will loop through particles to get
+    #solution to be closer to gBest.
+    while condition == 0:
+        for i in range(0, GENS):
+            for j in range(0,swarmSize):
+                solution  = 0
+                while solution == 0:
+                    #Do n times for each particle. (rand between 1-5)
+                    randvalue = random.randint(1,5)
+                    for k in range(0,randvalue):
+                        rand1 = random.randint(0, n-1)
+                        rand2 = random.randint(0, m-1)
+                        
+                        #Change values in particle based on the gBest data.
+                        if gBest[0][rand1][rand2] == 0:
+                            if newpopulation[j][0][rand1][rand2] == 1:
+                                newpopulation[j][0][rand1][rand2] = 0
+                                
+                        if gBest[0][rand1][rand2] == 1:
+                            if newpopulation[j][0][rand1][rand2] == 0:
+                                newpopulation[j][0][rand1][rand2] = 1
+                                
+                    #Check whether solution meets capacity.
+                    particlesize = calculating_size(sizeArray, newpopulation[j][0], n, m)
+                    if particlesize == capacity:
+                        #Calculate fitness of new particle.
+                        newFitness = calculating_fitness(newpopulation[j][0], n, m, weights)
+                        
+                        #Get index of value closer to optimum value from new particle and pBest
+                        comparingArray = [newFitness, newpopulation[j][1]]
+                        index = comparing_two_particles(comparingArray, optimumValue)
+                        
+                        #If index is the new particle, replace pBest with new particle.
+                        if index == 0:
+                            pBest[j] = newpopulation[j]
+                        #Calculate velocity.  - NOT COMPLETE
+                        
+                        #Update velocity.   - NOT COMPLETE
+                        
+                        #Add velocity to current pos to get new position. - NOT COMPLETE.
+                        
+                        solution = 1
+                        condition = 1
+                        
+                    else:
+                        #Solution does not meet capacity therefore data is restored to original.
+                        newpopulation[j] = population[j]
+
+            #Copy newpopulation = population - NOT COMPLETE
+            #population = newpopulation
+            
+            #Calculate gBest from newpopulation - NOT COMPLETE
+            
+            #Output data from each generation. - NOT COMPLETE
+            
+            #If newpop contains optimum fitness meet condition. - NOT COMPLETE
+            
+            #If maxgenerations met, print closest fitness. - NOT COMPLETE
+    
 
 
-main()
+initialization()
