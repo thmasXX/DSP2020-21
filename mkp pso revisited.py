@@ -62,7 +62,7 @@ def comparing_two_particles(particlefit, optimumValue):
 
 def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, sizeArray, capacity, weights):
     #Initialize generations and newGeneration array which replaces population after every generation.
-    GENS = 15
+    GENS = 50
     newpopulation = population
     #if data is changed within new population during the generation where the solution is not feasible
     #data will replaced with the original "population" data, this population data will be overwritten with the
@@ -75,9 +75,6 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
 
     #print(optimumValue)
 
-    #for t in range(0, swarmSize):
-        #print(newpopulation[t][1])
-
     #particle data = 0, fitness = 1, velocity = 2, pos = 3
 
     #Until condition has been met, in every generation, we will loop through particles to get
@@ -86,8 +83,8 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
         for j in range(0,swarmSize):
             solution  = 0
             while solution == 0:
-                #Do n times for each particle. (rand between 1-5)
-                randvalue = random.randint(3,5)
+                #Do n times for each particle.
+                randvalue = random.randint(1,2)
                 
                 for k in range(0,randvalue):
                     rand1 = random.randint(0, n-1)
@@ -106,9 +103,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                             
                 #Check whether solution meets capacity.
                 particlesize = calculating_size(sizeArray, newpopulation[j][0], n, m)
-                #print(particlesize)
-                #print(capacity)
-                #print("-----")
+                
                 if particlesize == capacity:
                     #Calculate fitness of new particle.
                     newFitness = calculating_fitness(newpopulation[j][0], n, m, weights)
@@ -141,7 +136,8 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                     #If index is the new particle, replace pBest with new particle.
                     if indexpBest == 0:
                         pBest[j] = newpopulation[j]
-                    
+
+                    #Particle has a valid solution.
                     solution = 1
                     
                 else:
@@ -152,17 +148,15 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
         population = newpopulation
     
         #Calculate gBest from newpopulation.
-        for t in range(0, swarmSize):
-            print(pBest[t][1])
-        gBest = calculating_gBest(pBest, optimumValue, swarmSize)
+        gBest = calculating_gBest(population, optimumValue, swarmSize)
     
         #Output data from each generation.
-        print("Generation", i)
+        print("Generation", i+1)
         print("Best Particle:", gBest[1])
         print("Optimum Value:", optimumValue)
         print("")
     
-        #If newpop contains optimum fitness meet condition. - NOT COMPLETE
+        #If newpop contains optimum fitness meet condition.
         if optimumValue in population:
             finish(gBest)
     
@@ -207,7 +201,7 @@ def initialization():
     particleData = []
     finalParticleData = []
 
-    swarmSize = 10
+    swarmSize = 20
 
     for i in range(0,n):
         for j in range(0,swarmSize):
@@ -230,7 +224,7 @@ def initialization():
 
     t = 0
 
-    while halfParticle < (n*10):
+    while halfParticle < (n*swarmSize):
         dataAdded = [particleData[t], particleData[halfParticle]]
         finalParticleData.append(dataAdded)
         halfParticle = halfParticle + 1
@@ -257,7 +251,7 @@ def initialization():
     #I will now calculate the fitness of each knapsack and the fitnesses of each particle.
     particleFitnesses = []
 
-    for i in range(0,10):
+    for i in range(0,swarmSize):
         particleFitnesses.append(calculating_fitness(finalParticleData[i], n, m, weightsArray))
 
     #print(particleFitnesses)
