@@ -62,7 +62,7 @@ def comparing_two_particles(particlefit, optimumValue):
 
 def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, sizeArray, capacity, weights):
     #Initialize generations and newGeneration array which replaces population after every generation.
-    GENS = 50
+    GENS = 200
     newpopulation = population
     #if data is changed within new population during the generation where the solution is not feasible
     #data will replaced with the original "population" data, this population data will be overwritten with the
@@ -74,7 +74,8 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
     c2 = 4
 
     #print(optimumValue)
-
+    #for t in range(0,swarmSize):
+        #print(population[t][1])
     #particle data = 0, fitness = 1, velocity = 2, pos = 3
 
     #Until condition has been met, in every generation, we will loop through particles to get
@@ -84,7 +85,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
             solution  = 0
             while solution == 0:
                 #Do n times for each particle.
-                randvalue = random.randint(1,2)
+                randvalue = random.randint(5,10)
                 
                 for k in range(0,randvalue):
                     rand1 = random.randint(0, n-1)
@@ -99,8 +100,24 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                         if newpopulation[j][0][rand1][rand2] == 0:
                             newpopulation[j][0][rand1][rand2] = 1
 
-                #print(newpopulation[j][0])
+                #----ADDING THIS IN FOR TESTING-----
+                #"MUTATING/ALTERING" DATA SO THEREFORE THE GBEST CAN LEARN ALSO.
+                #ERROR IN HERE MAKES PROGRAM STOP OR GET STUCK IN LOOP.
+                rate = 0.2
+                prob = random.uniform(0.0,100.0)
+                choice = random.randint(0,1)
+                randChoice = random.randint(0, m-1)
+                randIterations = random.randint(2,10)
+                for t in range(0,randIterations):
+                    if prob < (100 * rate):
+                        if newpopulation[j][0][choice][randChoice] == 1:
+                            newpopulation[j][0][choice][randChoice] = 0
                             
+                        if newpopulation[j][0][choice][randChoice] == 0:
+                            #Can only change to 1 if it has a size > 0.
+                            if sizeArray[choice][randChoice] > 0:
+                                newpopulation[j][0][choice][randChoice] = 1
+
                 #Check whether solution meets capacity.
                 particlesize = calculating_size(sizeArray, newpopulation[j][0], n, m)
                 
@@ -124,7 +141,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                     #Update velocity.
                     newpopulation[j][2] = newVelocity
                     
-                    #Add velocity to current pos to get new position. - NOT COMPLETE.
+                    #Add velocity to current pos to get new position.
                     newPos = population[j][3] + newVelocity
                     newpopulation[j][3] = newPos
                     
@@ -147,20 +164,25 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
         #Copy newpopulation = population.
         population = newpopulation
     
-        #Calculate gBest from newpopulation.
-        gBest = calculating_gBest(population, optimumValue, swarmSize)
+        #Calculate gBest from particle bests.
+        gBest = calculating_gBest(pBest, optimumValue, swarmSize)
     
         #Output data from each generation.
         print("Generation", i+1)
         print("Best Particle:", gBest[1])
         print("Optimum Value:", optimumValue)
         print("")
+
+        #for t in range(0, swarmSize):
+            #print(population[t][1])
     
         #If newpop contains optimum fitness meet condition.
         if optimumValue in population:
             finish(gBest)
     
         #If maxgenerations met, print closest fitness. - NOT COMPLETE
+        if i == 200:
+            finish(gBest)
          
 def initialization():
     #Read information from text files into variables.
