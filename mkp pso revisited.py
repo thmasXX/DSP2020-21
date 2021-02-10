@@ -62,7 +62,7 @@ def comparing_two_particles(particlefit, optimumValue):
 
 def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, sizeArray, capacity, weights):
     #Initialize generations and newGeneration array which replaces population after every generation.
-    GENS = 200
+    GENS = 250
     newpopulation = population
     #if data is changed within new population during the generation where the solution is not feasible
     #data will replaced with the original "population" data, this population data will be overwritten with the
@@ -72,6 +72,9 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
     c0 = 1
     c1 = 2
     c2 = 4
+
+    print("Optimum Value:", optimumValue)
+    print("")
 
     #print(optimumValue)
     #for t in range(0,swarmSize):
@@ -106,14 +109,14 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                 rate = 0.2
                 prob = random.uniform(0.0,100.0)
                 choice = random.randint(0,1)
-                randChoice = random.randint(0, m-1)
-                randIterations = random.randint(2,10)
-                for t in range(0,randIterations):
+                randChoice = random.randint(0,m-1)
+                t = 0
+                for t in range(0,6):
                     if prob < (100 * rate):
                         if newpopulation[j][0][choice][randChoice] == 1:
                             newpopulation[j][0][choice][randChoice] = 0
                             
-                        if newpopulation[j][0][choice][randChoice] == 0:
+                        elif newpopulation[j][0][choice][randChoice] == 0:
                             #Can only change to 1 if it has a size > 0.
                             if sizeArray[choice][randChoice] > 0:
                                 newpopulation[j][0][choice][randChoice] = 1
@@ -170,7 +173,6 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
         #Output data from each generation.
         print("Generation", i+1)
         print("Best Particle:", gBest[1])
-        print("Optimum Value:", optimumValue)
         print("")
 
         #for t in range(0, swarmSize):
@@ -181,8 +183,8 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
             finish(gBest)
     
         #If maxgenerations met, print closest fitness. - NOT COMPLETE
-        if i == 200:
-            finish(gBest)
+        #if i == 200:
+            #finish(gBest)
          
 def initialization():
     #Read information from text files into variables.
