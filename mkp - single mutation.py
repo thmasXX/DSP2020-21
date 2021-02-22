@@ -73,9 +73,6 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
     c1 = 2
     c2 = 4
 
-    totalReward = 0
-    mutationRewards = [0,0,0]
-
     print("Optimum Value:", optimumValue)
     print("")
 
@@ -113,73 +110,16 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                 prob = random.uniform(0.0,100.0)
                 choice = random.randint(0,1)
                 randChoice = random.randint(0,m-1)
-
-                mutate1 = newpopulation
-                mutate2 = newpopulation
-                mutate3 = newpopulation
-            
+                t = 0
                 for t in range(0,6):
                     if prob < (100 * rate):
-                        if mutate1[j][0][choice][randChoice] == 1:
-                            mutate1[j][0][choice][randChoice] = 0
+                        if newpopulation[j][0][choice][randChoice] == 1:
+                            newpopulation[j][0][choice][randChoice] = 0
                             
-                        elif mutate1[j][0][choice][randChoice] == 0:
+                        elif newpopulation[j][0][choice][randChoice] == 0:
+                            #Can only change to 1 if it has a size > 0.
                             if sizeArray[choice][randChoice] > 0:
-                                mutate1[j][0][choice][randChoice] = 1
-
-                        if mutate2[j][0][choice][randChoice] == 1:
-                            mutate2[j][0][choice][randChoice] = 0
-                            
-                        elif mutate2[j][0][choice][randChoice] == 0:
-                            if sizeArray[choice][randChoice] > 0:
-                                mutate2[j][0][choice][randChoice] = 1
-
-                        if mutate3[j][0][choice][randChoice] == 1:
-                            mutate3[j][0][choice][randChoice] = 0
-                            
-                        elif mutate3[j][0][choice][randChoice] == 0:
-                            if sizeArray[choice][randChoice] > 0:
-                                mutate3[j][0][choice][randChoice] = 1
-
-                #ADAPTIVE SELECTION.
-                if totalReward < 15:
-                    randomMutate = random.randint(0,2)
-                    if randomMutate == 0:
-                        newpopulation = mutate1
-                        mutationRewards[0] = mutationRewards[0] + 1
-                        totalReward = totalReward + 1
-                        
-                    if randomMutate == 1:
-                        newpopulation = mutate2
-                        mutationRewards[1] = mutationRewards[1] + 1
-                        totalReward = totalReward + 1
-                        
-                    if randomMutate == 2:
-                        newpopulation = mutate3
-                        mutationRewards[2] = mutationRewards[2] + 1
-                        totalReward = totalReward + 1
-
-                else:
-                    mutationPercentage1 = mutationRewards[0]
-                    mutationPercentage2 = mutationRewards[0] + mutationRewards[1]
-                    mutationPercentage3 = mutationRewards[0] + mutationRewards[1] + mutationRewards[2]
-
-                    randPercentage = random.randint(1,totalReward)
-
-                    if randPercentage <= mutationPercentage1:
-                        newpopulation = mutate1
-                        mutationRewards[0] = mutationRewards[0] + 1
-                        totalReward = totalReward + 1
-
-                    elif (randPercentage <= mutationPercentage2) & (randPercentage > mutationPercentage1):
-                        newpopulation = mutate2
-                        mutationRewards[1] = mutationRewards[1] + 1
-                        totalReward = totalReward + 1
-
-                    elif (randPercentage <= mutationPercentage3) & (randPercentage > mutationPercentage2):
-                        newpopulation = mutate3
-                        mutationRewards[2] = mutationRewards[2] + 1
-                        totalReward = totalReward + 1
+                                newpopulation[j][0][choice][randChoice] = 1
 
                 #Check whether solution meets capacity.
                 particlesize = calculating_size(sizeArray, newpopulation[j][0], n, m)
@@ -243,9 +183,8 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
             finish(gBest)
     
         #If maxgenerations met, print closest fitness. - NOT COMPLETE
-        if i == 249:
-            finishGenerations(gBest)
-            #print(totalReward, mutationRewards)
+        #if i == 200:
+            #finish(gBest)
          
 def initialization():
     #Read information from text files into variables.
@@ -379,11 +318,6 @@ def initialization():
 
 def finish(gBest):
     print("Optimum value found!")
-    print(gBest)
-
-def finishGenerations(gBest):
-    print("Maximum generations reached!")
-    print("Printing best particle...")
     print(gBest)
 
 initialization()

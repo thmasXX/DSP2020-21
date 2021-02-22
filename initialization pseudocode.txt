@@ -1,0 +1,11 @@
+READ data from text file
+CREATE variables for specific data
+INITIALIZE n particles with random 0,1 data
+CALCULATE size of each particle
+IF particleSize > capacity of knapsacks:
+	RANDOM replace 1,0's to find solution
+CALCULATE fitness of particle
+INITIALIZE random velocity between -2.0 and 2.0
+INITIALIZE random position between 0.0 and 4.0
+INITIALIZE pBest as current particle data
+CALCULATE gBest

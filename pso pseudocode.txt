@@ -1,0 +1,49 @@
+INITIALIZE generation variable
+INITIALIZE generationParticle array 
+**Generation Particle will contain the new data for the particles, which at the end 
+of each generation will copy over the old data.**
+
+WHILE condition == NOT MET:
+	FOR range (0, generation)
+		LOOP per particle
+			WHILE solution == 0
+				FOR i in range(0, swarmSize):
+					GENERATE random number iterations
+					FOR k in range(0, random iterations)
+     						GENERATE random index(0,m) **m being amount of index's within particle
+     						IF gBest[random index] == 1 &  particle[random index] == 0
+          						particle[random index] = 1
+						IF gBest[random index] == 0 &  particle[random index] == 1
+          						particle[random index] = 0
+					MUTATE particle
+					COMPARE currentParticle WITH pBest
+					IF currentParticle CLOSER TO optimumValue THAN pBest:
+						pBest = currentParticle
+					CALCULATE velocity
+					UPDATE velocity
+					ADD velocity to current pos to get new position.
+					IF currentParticle == capacity:
+						STORE particleData IN generationParticle
+							solution = 1
+					ELSE:
+						START LOOP AGAIN
+			COPY generationParticle OVER initial particle data.
+			CALCULATE gBest.
+
+		IF particledata CONTAINS fitness == optimum value
+			OUTPUT particle solution.
+			condition = MET
+		IF generation = MAX:
+			CALCULATE solution closest to optimum value
+			OUTPUT particle solution.
+			condition = MET
+
+
+
+
+particle FOLLOW gBest (**needs understanding of how to make particle move**)
+FOR i in range(0, swarmSize):
+     GENERATE random index(0,m) **m being amount of index's within particle
+     IF gBest[random index] == 1 &  particle[random index] == 0
+          particle[random index] = 1
+This can be done 3/4 times randomly between say a number between 1-5 so each particle can learn part of the gBest

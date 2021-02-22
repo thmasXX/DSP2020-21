@@ -1,0 +1,26 @@
+TOTAL COUNT
+CREDIT COUNT FOR MUTATE1
+CREDIT COUNT FOR MUTATE2  - #Initializing how many times each mutate has been used.
+CREDIT COUNT FOR MUTATE3 
+
+MUTATE DATA1
+MUTATE DATA2
+MUTATE DATA3
+
+#Question: should I just let the selections run through? and not check for capacity and just
+classify it as a non-solution if it dont meet the constraints and let it run again and just
+-1 for all the credit counts that were iterated up one?
+
+CHECK IF ANY MUTATED DATA MEETS CAPACITY.
+IF ANY MEET CAPACITY:
+	CHECK WHICH MEET CAPACITY
+	COMPARE CREDITS BETWEEN ONES THAT MEET CAPACITY
+	CHOOSE MUTATION WITH MOST CREDITS AS DATA TO BE PROGRESSED.
+	CREDIT THAT MUTATION
+	
+	IF CREDITS BETWEEN BOTH ARE EQUAL
+		RANDOM SELECT ONE OF MUTATIONS
+		CREDIT THAT MUTATION.
+	
+
+
