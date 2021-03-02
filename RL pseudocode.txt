@@ -1,0 +1,32 @@
+INITIALIZE REWARD value for each mutation
+
+Q-LEARNING THROUGH MUTATION
+
+MUTATE 3 SETS OF DATA
+CALCULATE THE FITNESSES OF EACH DATA
+
+IF FITNESS CLOSER TO OPTIMAL THAT ORIGINAL DATA:
+	REWARD that mutation = + 1
+IF FITNESS FURTHER FROM OPTIMAL THAN ORIGINAL DATA:
+	REWARD that mutation = -1
+
+IF mutation reward is more than it was before:
+	CHOOSE BEST fitness generated
+
+OVERWRITE THAT MUTATED DATA OVER PARTICLE EXISITING DATA
+
+then check for constraints etc as per usual...
+
+OR
+
+INITIALIZE Q-TABLE VALUES TO 0
+
+STATE SIZE = PARTICLE DATA (MUTATED)
+ACTION SIZE = NEW FITNESS
+
+CALCULATE EACH FITNESS of the new mutated data
+
+SCAN THROUGH TABLE and if the new fitness is better than original fitness
+CHOOSE MUTATION with that fitness
+
+and then test constraints etc...

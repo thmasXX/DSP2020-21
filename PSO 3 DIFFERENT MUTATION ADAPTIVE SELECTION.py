@@ -121,7 +121,7 @@ def comparing_particles(particlefit, optimumValue):
 
 def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, sizeArray, capacity, weights):
     #Initialize generations and newGeneration array which replaces population after every generation.
-    GENS = 150
+    GENS = 75
     newpopulation = population
 
     #For creating graphs.

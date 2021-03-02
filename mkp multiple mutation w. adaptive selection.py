@@ -111,7 +111,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                 #ERROR IN HERE MAKES PROGRAM STOP OR GET STUCK IN LOOP.
                 rate = 0.2
                 prob = random.uniform(0.0,100.0)
-                choice = random.randint(0,1)
+                choice = random.randint(0,n-1)
                 randChoice = random.randint(0,m-1)
 
                 mutate1 = newpopulation
@@ -143,6 +143,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
 
                 #ADAPTIVE SELECTION.
                 if totalReward < 15:
+                    #For first 15 attempts at solutions, choose randomly.
                     randomMutate = random.randint(0,2)
                     if randomMutate == 0:
                         newpopulation = mutate1
@@ -159,12 +160,14 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                         mutationRewards[2] = mutationRewards[2] + 1
                         totalReward = totalReward + 1
 
+                #Then calculate percentage e.g. mutate1 1-8, mutate2 9-15 etc.
                 else:
                     mutationPercentage1 = mutationRewards[0]
                     mutationPercentage2 = mutationRewards[0] + mutationRewards[1]
                     mutationPercentage3 = mutationRewards[0] + mutationRewards[1] + mutationRewards[2]
 
                     randPercentage = random.randint(1,totalReward)
+                    #Choose a random value and if that value lands in that percentile, choose that mutation.
 
                     if randPercentage <= mutationPercentage1:
                         newpopulation = mutate1
