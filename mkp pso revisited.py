@@ -29,58 +29,7 @@ def meeting_capacity(particlesize, particleArray, n, m, capacity, sizeArray):
                     particleArray[i][rand2] = 1
         #Calculate new size.
         particlesize = calculating_size(sizeArray, particleArray, n, m)
-    return particlesize
-
-##def meetCapacityPSO(particlesize, particleArray, n, m, capacity, sizeArray):
-##    size = particlesize
-##    capacityMet = 0
-##    while capacityMet == 0:
-##        
-##        if size[0] > capacity[0]:
-####            difference = size[0] - capacity[0]
-####            if difference in sizeArray[0]:
-####                index = sizeArray[0].index(difference)
-####                particleArray[0][index] = 0
-####            else:
-##            randVal = random.randint(0, m-1)
-##            particleArray[1][randVal] = 0
-##
-##        if size[0] < capacity[0]:
-####            difference = capacity[0] - size[0]
-####            if difference in sizeArray[0]:
-####                index = sizeArray[0].index(difference)
-####                particleArray[0][index] = 1
-####            else:
-##            randVal = random.randint(0, m-1)
-##            particleArray[1][randVal] = 1
-##
-##        if size[1] > capacity[1]:
-####            difference = size[1] - capacity[1]
-####            if difference in sizeArray[1]:
-####                index = sizeArray[1].index(difference)
-####                particleArray[1][index] = 0
-####            else:
-##            randVal = random.randint(0, m-1)
-##            particleArray[1][randVal] = 0
-##
-##        if size[1] < capacity[1]:
-####            difference = capacity[1] - size[1]
-####            if difference in sizeArray[1]:
-####                index = sizeArray[1].index(difference)
-####                particleArray[1][index] = 1
-####            else:
-##            randVal = random.randint(0, m-1)
-##            particleArray[1][randVal] = 1
-##
-##        size = calculating_size(sizeArray, particleArray, n, m)
-##        #print(size)
-##
-##        if size == capacity:
-##            capacityMet = 1
-##            #print("capacity met")
-##            
-##    return particleArray
-    
+    return particlesize  
 
 def calculating_fitness(particle, n, m, weights):
     totalFitness = 0
@@ -119,9 +68,9 @@ def comparing_particles(particlefit, optimumValue):
     #print(pBestIndex)
     return pBestIndex
 
-def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, sizeArray, capacity, weights):
+def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, sizeArray, capacity, weights, gBestArray):
     #Initialize generations and newGeneration array which replaces population after every generation.
-    GENS = 150
+    GENS = 90
     newpopulation = population
 
     #For creating graphs.
@@ -199,8 +148,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                     if mutate3[0][choice][randChoice] == 1:
                         mutate3[0][choice][randChoice] = 0
                     else:
-                        if sizeArray[choice][randChoice] > 0:
-                            mutate3[0][choice][randChoice] = 1   
+                        mutate3[0][choice][randChoice] = 1   
 
                 #ADAPTIVE SELECTION.
                 if totalReward < 15:
@@ -277,7 +225,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                     newpopulation[j][3] = newPos
                     
                     #Get index of value closer to optimum value from new particle and pBest
-                    comparingArray = [newFitness, newpopulation[j][1]]
+                    comparingArray = [newFitness, pBest[j][1]]
                     indexpBest = comparing_particles(comparingArray, optimumValue)
                     #print(indexpBest)
 
@@ -292,7 +240,6 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
 
                 else:
                     newpopulation[j] = population[j]
-
                     if selected == 0:
                         mutationRewards[0] = mutationRewards[0] - 1
                         totalReward = totalReward - 1
@@ -307,12 +254,10 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
         population = newpopulation
     
         #Calculate gBest from particle bests.
-        newGBest = calculating_gBest(population, optimumValue, swarmSize, sizeArray, n, m, capacity)
+        newGBest = calculating_gBest(pBest, optimumValue, swarmSize, sizeArray, n, m, capacity)
         if newGBest[1] < gBest[1]:
             gBest = newGBest
-
-        #for t in range(0, swarmSize):
-            #print(population[t][1])
+        gBestArray.append(gBest)
 
         generationlist.append(i+1)
         if mutationRewards[0] == 0:
@@ -326,14 +271,17 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
             list2.append((mutationRewards[1] / totalReward) * 100)
             list3.append((mutationRewards[2] / totalReward) * 100)
 
+        maxIndex = len(gBestArray) - 1
+
         #Output data from each generation.
         print("Generation", i+1)
         print("Best Particle:", gBest[1], gBest[4])
+        #print(gBestArray[maxIndex][1], gBestArray[maxIndex-1][1])
         print("")
     
-        #If newpop contains optimum fitness meet condition.
-        if optimumValue in population:
-            finish(gBest)
+##        #If newpop contains optimum fitness meet condition.
+##        if optimumValue in population:
+##            finish(gBest)
     
         #If maxgenerations met, print closest fitness.
         if i == GENS-1:
@@ -341,7 +289,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
             print(totalReward, mutationRewards)
 
         #Function for graph creating for adaptive selection.
-        #if i == 249:
+        #if i == GENS-1:
             #graphAdaptiveSelection(generationlist, list1, list2, list3)
          
 def initialization():
@@ -470,7 +418,10 @@ def initialization():
 
     gBest = calculating_gBest(pBest, optimumValue, swarmSize, finalsizesArray, n, m, capacitiesArray)
 
-    pso(particleArray, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, finalsizesArray, capacitiesArray, weightsArray)
+    gBestArray = []
+    gBestArray.append(gBest)
+
+    pso(particleArray, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, finalsizesArray, capacitiesArray, weightsArray, gBestArray)
 
 def graphAdaptiveSelection(generationlist, list1, list2, list3):
     plt.plot(generationlist, list1)
