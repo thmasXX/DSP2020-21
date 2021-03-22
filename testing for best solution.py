@@ -2,7 +2,6 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
-import copy
 #Using reals, such as 1.0 and 0.0
 
 def calculating_size(sizeArray, particles, n, m):
@@ -77,10 +76,11 @@ def comparingbestSolutions(particles, optimal):
 def repair(particle, particlesize, n, m, capacity, sizeArray):
     repaired = False
     while repaired == False:
-        for i in range(0, n):
-            randomRepair = random.randint(0,m-1)
-            if particlesize[i] > capacity[i]:
-                particle[0][0][randomRepair] = 0
+        randomRepair = random.randint(0,m-1)
+        if particlesize[0] > capacity[0]:
+            particle[0][0][randomRepair] = 0
+        if particlesize[1] > capacity[1]:
+            particle[0][1][randomRepair] = 0
         checkIfRepaired = calculating_size(sizeArray, particle[0], n, m)
         if checkIfRepaired <= capacity:
             repaired = True
@@ -90,7 +90,7 @@ def repair(particle, particlesize, n, m, capacity, sizeArray):
 def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, sizeArray, capacity, weights, gBestArray):
     #Initialize generations and newGeneration array which replaces population after every generation.
     GENS = 75
-    newpopulation = copy.deepcopy(population)
+    newpopulation = population
 
     filename = 'best solution from each generation.csv'
     f = open(filename, mode='w+')
@@ -147,41 +147,31 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                 #"MUTATING/ALTERING" DATA SO THEREFORE THE GBEST CAN LEARN ALSO.
                 rate = 0.2
                 prob = random.uniform(0.0,100.0)
-
-                Interchoice = random.randint(0,n-1)
-                InterrandChoice = random.randint(0,m-1) 
-                Interchoice2 = random.randint(0,n-1)
-                InterrandChoice2 = random.randint(0,m-1)
-
-                Swapchoice = random.randint(0,n-1)
-                SwaprandChoice = random.randint(0,m-1)
-                Swapchoice2 = random.randint(0,n-1)
-                SwaprandChoice2 = random.randint(0,m-1)
-
-                Bitchoice = random.randint(0,n-1)
-                BitrandChoice = random.randint(0,m-1)
+                choice = random.randint(0,n-1)
+                randChoice = random.randint(0,m-1)
                 
-                mutate1 = copy.deepcopy(newpopulation[j])
-                mutate2 = copy.deepcopy(newpopulation[j])
-                mutate3 = copy.deepcopy(newpopulation[j])
+                choice2 = random.randint(0,n-1)
+                randChoice2 = random.randint(0,m-1)
+
+                mutate1 = newpopulation[j]
+                mutate2 = newpopulation[j]
+                mutate3 = newpopulation[j]
 
                 if prob < (100*rate):
                     #MUTATION 1 - INTERCHANGING MUTATION.
                     interchange = random.randint(0,1)
                     interchange2 = random.randint(0,1)
-                    mutate1[0][Interchoice][InterrandChoice] = interchange
-                    mutate1[0][Interchoice2][InterrandChoice2] = interchange2
+                    mutate1[0][choice][randChoice] = interchange
+                    mutate1[0][choice2][randChoice2] = interchange2
 
                     #MUTATION 2 - SWAP MUTATION.
-                    temp1 = mutate2[0][Swapchoice][SwaprandChoice]
-                    mutate2[0][Swapchoice][SwaprandChoice] = mutate2[0][Swapchoice2][SwaprandChoice2]
-                    mutate2[0][Swapchoice2][SwaprandChoice2] = temp1
+                    mutate2[0][choice][randChoice] = mutate2[0][choice][randChoice2]
 
                     #MUTATION 3 - BIT FLIP MUTATION.
-                    if mutate3[0][Bitchoice][BitrandChoice] == 1:
-                        mutate3[0][Bitchoice][BitrandChoice] = 0
+                    if mutate3[0][choice][randChoice] == 1:
+                        mutate3[0][choice][randChoice] = 0
                     else:
-                        mutate3[0][Bitchoice][BitrandChoice] = 1  
+                        mutate3[0][choice][randChoice] = 1   
 
                 #ADAPTIVE SELECTION.
                 if totalReward < 15:
@@ -237,7 +227,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                 particlesize = calculating_size(sizeArray, newpopulation[j][0], n, m)
                 newFitness = calculating_fitness(newpopulation[j][0], n, m, weights)
 
-                if (newFitness >= optimumValue):
+                if (newFitness >= optimumValue) & (particlesize <= capacity):
                     #Calculate fitness of new particle.
 
                     #Calculate velocity.
@@ -274,7 +264,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                     solution = 1
 
                 else:
-                    newpopulation[j] = copy.deepcopy(population[j])
+                    newpopulation[j] = population[j]
                     if selected == 0:
                         mutationRewards[0] = mutationRewards[0] - 1
                         totalReward = totalReward - 1
@@ -286,12 +276,12 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                         totalReward = totalReward - 1
 
         #Copy newpopulation = population.
-        population = copy.deepcopy(newpopulation)
+        population = newpopulation
     
         #Calculate gBest from particle bests.
         gBest = calculating_gBest(pBest, optimumValue, swarmSize, sizeArray, n, m, capacity)
         data = [gBest[0], gBest[1], gBest[4]]
-        with open('best solution from each generation.csv', mode='a', newline='') as csvFile:
+        with open('best solution from each generation.csv', mode='a') as csvFile:
             csvWriter = csv.writer(csvFile, delimiter=',')
             csvWriter.writerow(data)
             csvFile.close()
@@ -316,9 +306,8 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
         print("")
     
         #If newpop contains optimum fitness meet condition.
-        for t in range(0, len(population)):
-            if population[t][1] == optimumValue:
-                finish(population[t])
+        if optimumValue in population:
+            finish(gBest)
     
         #If maxgenerations met, print closest fitness.
         if i == GENS - 1:
@@ -338,10 +327,10 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
         #if i == GENS-1:
             #graphAdaptiveSelection(generationlist, list1, list2, list3)
          
-def initialization(filename):
+def initialization():
     #Read information from text files into variables.
     #Currently only doing for two knapsacks.
-    with open(filename,'r') as reader:
+    with open('data.txt','r') as reader:
         n = reader.readline()
         m = reader.readline()
         weights = reader.readline()
@@ -386,21 +375,32 @@ def initialization(filename):
 
     swarmSize = 20
 
-    for j in range(0,swarmSize):
-        finalParticle = []
-        for i in range(0,n):
+    for i in range(0,n):
+        for j in range(0,swarmSize):
             particle = []
+            finalParticle = []
                 
-            for k in range(0,m):   
+            for k in range(0, m):
                 if finalsizesArray[i][k] == 0:
                     particle.append(0)
                 else:
                     randomAddition = random.randint(0.0,1.0)
                     particle.append(randomAddition)
 
-            finalParticle.append(particle)
+            particleData.append(particle)
 
-        finalParticleData.append(finalParticle)
+    #print(particleData[0], particleData[10])
+
+    halfParticle = len(particleData) / n
+    halfParticle = int(halfParticle)
+
+    t = 0
+
+    while halfParticle < (n*swarmSize):
+        dataAdded = [particleData[t], particleData[halfParticle]]
+        finalParticleData.append(dataAdded)
+        halfParticle = halfParticle + 1
+        t = t + 1
 
     #Output of 1 particle. (Testing)
     #print(finalParticleData[0])
@@ -487,35 +487,4 @@ def finishGenerations(bestSolution):
     print("Printing best particle...")
     print(bestSolution)
 
-def mainmenu():
-    print("PSO with adaptive mutation selection algorithm.")
-    print("")
-    print("Data files are numbered 1-10.")
-    dataFileChoice = input("Enter data file number: ")
-
-    if dataFileChoice == '1':
-        initialization("data1.txt")
-    elif dataFileChoice == '2':
-        initialization("data2.txt")
-    elif dataFileChoice == '3':
-        initialization("data3.txt")
-    elif dataFileChoice == '4':
-        initialization("data4.txt")
-    elif dataFileChoice == '5':
-        initialization("data5.txt")
-    elif dataFileChoice == '6':
-        initialization("data6.txt")
-    elif dataFileChoice == '7':
-        initialization("data7.txt")
-    elif dataFileChoice == '8':
-        initialization("data8.txt")
-    elif dataFileChoice == '9':
-        initialization("data9.txt")
-    elif dataFileChoice == '10':
-        initialization("data10.txt")
-    else:
-        print("Enter correct value (1-10).")
-        print("")
-        mainmenu()
-
-mainmenu()
+initialization()

@@ -86,11 +86,12 @@ def repair(particle, particlesize, n, m, capacity, sizeArray):
             repaired = True
             return particle
     
-
 def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, sizeArray, capacity, weights, gBestArray):
     #Initialize generations and newGeneration array which replaces population after every generation.
-    GENS = 75
+    GENS = 150
     newpopulation = copy.deepcopy(population)
+
+    QLearning = []
 
     filename = 'best solution from each generation.csv'
     f = open(filename, mode='w+')
@@ -145,9 +146,9 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
 
                 #----ADDING THIS IN FOR TESTING-----
                 #"MUTATING/ALTERING" DATA SO THEREFORE THE GBEST CAN LEARN ALSO.
-                rate = 0.2
+                rate = 0.4
                 prob = random.uniform(0.0,100.0)
-
+                
                 Interchoice = random.randint(0,n-1)
                 InterrandChoice = random.randint(0,m-1) 
                 Interchoice2 = random.randint(0,n-1)
@@ -181,55 +182,57 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                     if mutate3[0][Bitchoice][BitrandChoice] == 1:
                         mutate3[0][Bitchoice][BitrandChoice] = 0
                     else:
-                        mutate3[0][Bitchoice][BitrandChoice] = 1  
+                        mutate3[0][Bitchoice][BitrandChoice] = 1   
 
-                #ADAPTIVE SELECTION.
-                if totalReward < 15:
-                    randomMutate = random.randint(0,2)
-                    
-                    if randomMutate == 0:
-                        newpopulation[j] = mutate1
-                        mutationRewards[0] = mutationRewards[0] + 1
-                        totalReward = totalReward + 1
-                        selected = 0
-                        
-                    if randomMutate == 1:
-                        newpopulation[j] = mutate2
-                        mutationRewards[1] = mutationRewards[1] + 1
-                        totalReward = totalReward + 1
-                        selected = 1
-                        
-                    if randomMutate == 2:
-                        newpopulation[j] = mutate3
-                        mutationRewards[2] = mutationRewards[2] + 1
-                        totalReward = totalReward + 1
-                        selected = 2                   
+                #Q-LEARNING ALGORITHM.
+                #Update mutations.
+                mutate1[1] = calculating_fitness(mutate1[0], n, m, weights)
+                mutate2[1] = calculating_fitness(mutate2[0], n, m, weights)
+                mutate3[1] = calculating_fitness(mutate3[0], n, m, weights)
+
+                #print(mutate1[1], mutate2[1], mutate3[1], newpopulation[j][1])
+                
+                #Find best solution out of mutations
+                findingBestFitnessMutate = [mutate1[1], mutate2[1], mutate3[1]]
+                findingBestFitnessIndex = comparing_particles(findingBestFitnessMutate, optimumValue)
+                bestQLearningSol = findingBestFitnessMutate[findingBestFitnessIndex]
+
+                valueMut1 = [mutate1[0], mutate1[1]]
+                valueMut2 = [mutate2[0], mutate2[1]]
+                valueMut3 = [mutate3[0], mutate3[1]]
+                valueNP = [newpopulation[j][0], newpopulation[j][1]]
+
+                #print(bestQLearningSol, newpopulation[j][1])
+
+                #Give it a positive/negative reward based on fitness compared to current global best.
+                if bestQLearningSol <= newpopulation[j][1]:
+                    reward = 1.0
+                else:
+                    reward = -1.0
+
+                #Assigning Q-learning values dependant on each mutation.
+                if findingBestFitnessIndex == 0:
+                    QLvalue = [reward, valueNP, valueMut1]
+                elif findingBestFitnessIndex == 1:
+                    QLvalue = [reward, valueNP, valueMut2]
+                elif findingBestFitnessIndex == 2:
+                    QLvalue = [reward, valueNP, valueMut3]
+
+                #Check if any Q-Learning values are within table.
+                #Only use value in qLearning table if positive reward.
+                if (QLvalue in QLearning) & (reward == 1.0):
+                    QLvalueIndex = QLearning.index(QLvalue)
+                    #Assign particle Q-Learning already.
+                    newpopulation[j][0] = QLearning[QLvalueIndex][2][0]
+
+                #If not within table, add new q-learning to table and assign mutation.
+                elif (QLvalue in QLearning) & (reward == -1.0):
+                    continue
 
                 else:
-                    mutationPercentage1 = mutationRewards[0]
-                    mutationPercentage2 = mutationRewards[0] + mutationRewards[1]
-                    mutationPercentage3 = mutationRewards[0] + mutationRewards[1] + mutationRewards[2]
-
-                    randPercentage = random.randint(1,totalReward)
-
-                    if randPercentage <= mutationPercentage1:
-                        newpopulation[j] = mutate1
-                        mutationRewards[0] = mutationRewards[0] + 1
-                        totalReward = totalReward + 1
-                        selected = 0
-
-                    elif (randPercentage <= mutationPercentage2) & (randPercentage > mutationPercentage1):
-                        newpopulation[j] = mutate2
-                        mutationRewards[1] = mutationRewards[1] + 1
-                        totalReward = totalReward + 1
-                        selected = 1
-
-                    elif (randPercentage <= mutationPercentage3) & (randPercentage > mutationPercentage2):
-                        newpopulation[j] = mutate3
-                        mutationRewards[2] = mutationRewards[2] + 1
-                        totalReward = totalReward + 1
-                        selected = 2
-
+                    QLearning.append(QLvalue)
+                    newpopulation[j][0] = QLvalue[2][0]
+                    
                 #Check whether solution meets capacity.
                 particlesize = calculating_size(sizeArray, newpopulation[j][0], n, m)
                 if particlesize > capacity:
@@ -237,9 +240,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                 particlesize = calculating_size(sizeArray, newpopulation[j][0], n, m)
                 newFitness = calculating_fitness(newpopulation[j][0], n, m, weights)
 
-                if (newFitness >= optimumValue):
-                    #Calculate fitness of new particle.
-
+                if newFitness >= optimumValue:
                     #Calculate velocity.
                     random1 = random.uniform(0,1)
                     random2 = random.uniform(0,1)
@@ -275,15 +276,6 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
 
                 else:
                     newpopulation[j] = copy.deepcopy(population[j])
-                    if selected == 0:
-                        mutationRewards[0] = mutationRewards[0] - 1
-                        totalReward = totalReward - 1
-                    elif selected == 1:
-                        mutationRewards[1] = mutationRewards[1] - 1
-                        totalReward = totalReward - 1
-                    elif selected == 2:
-                        mutationRewards[2] = mutationRewards[2] - 1
-                        totalReward = totalReward - 1
 
         #Copy newpopulation = population.
         population = copy.deepcopy(newpopulation)
@@ -321,7 +313,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                 finish(population[t])
     
         #If maxgenerations met, print closest fitness.
-        if i == GENS - 1:
+        if i == GENS-1:
             with open('best solution from each generation.csv', mode='r') as csvFile:
                 csv_reader = csv.reader(csvFile)
                 csvList = list(csv_reader)
@@ -332,7 +324,8 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
             bestSolutionIndex = np.argmin(np.abs(np.array(gBestFits)-optimumValue))
             bestSolution = csvList[bestSolutionIndex]
             finishGenerations(bestSolution)
-            print(totalReward, mutationRewards)
+            #print(totalReward, mutationRewards)
+            #print(QLearning)
 
         #Function for graph creating for adaptive selection.
         #if i == GENS-1:
@@ -349,13 +342,6 @@ def initialization(filename):
         sizes = reader.readline()
         optimumValue = reader.readline()
     reader.close()
-
-    #n = n.strip('\n')
-    #m = m.strip('\n')
-    #weights = weights.strip('\n')
-    #capacities = capacities.strip('\n')
-    #sizes = sizes.strip('\n')
-    #optimumValue = optimumValue.strip('\n')
 
     n = int(n)
     m = int(m)
@@ -391,7 +377,7 @@ def initialization(filename):
         for i in range(0,n):
             particle = []
                 
-            for k in range(0,m):   
+            for k in range(0,m):     
                 if finalsizesArray[i][k] == 0:
                     particle.append(0)
                 else:
@@ -399,12 +385,8 @@ def initialization(filename):
                     particle.append(randomAddition)
 
             finalParticle.append(particle)
-
+            
         finalParticleData.append(finalParticle)
-
-    #Output of 1 particle. (Testing)
-    #print(finalParticleData[0])
-    #print(finalParticleData[0][1][3])
 
     #Now, I have a particle array, contiaining 10 elements, within those elements are two knapsacks.
 
@@ -475,7 +457,6 @@ def graphAdaptiveSelection(generationlist, list1, list2, list3):
 
     plt.title('Adaptive Selection over Generations')
     plt.show()
-    
 
 def finish(gBest):
     print("Optimum value found!")
@@ -488,7 +469,7 @@ def finishGenerations(bestSolution):
     print(bestSolution)
 
 def mainmenu():
-    print("PSO with adaptive mutation selection algorithm.")
+    print("PSO with Q-Learning algorithm.")
     print("")
     print("Data files are numbered 1-10.")
     dataFileChoice = input("Enter data file number: ")
