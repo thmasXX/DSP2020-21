@@ -76,7 +76,7 @@ def repair(particle, particlesize, n, m, capacity, sizeArray):
         for i in range(0, n):
             randomRepair = random.randint(0,m-1)
             if particlesize[i] > capacity[i]:
-                particle[0][0][randomRepair] = 0
+                particle[0][i][randomRepair] = 0
         checkIfRepaired = calculating_size(sizeArray, particle[0], n, m)
         if checkIfRepaired <= capacity:
             repaired = True
@@ -93,6 +93,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
     f.close()
 
     gBestFits = []
+    bestFits = []
 
     #For creating graphs.
     generationlist = []
@@ -193,35 +194,37 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
         #Calculate gBest from particle bests.
         gBest = calculating_gBest(pBest, optimumValue, swarmSize, sizeArray, n, m, capacity)
         data = [gBest[0], gBest[1], gBest[4]]
-        with open('best solution from each generation.csv', mode='a', newline='') as csvFile:
-            csvWriter = csv.writer(csvFile, delimiter=',')
-            csvWriter.writerow(data)
-            csvFile.close()
+        gBestFits.append(data)
+##        with open('best solution from each generation.csv', mode='a', newline='') as csvFile:
+##            csvWriter = csv.writer(csvFile, delimiter=',')
+##            csvWriter.writerow(data)
+##            csvFile.close()
+
+        data2 = copy.deepcopy(gBest[1])
+        bestFits.append(data2)
 
         generationlist.append(i+1)
 
         #Output data from each generation.
         print("Generation", i+1)
         print("Best Particle:", gBest[1], gBest[4])
-        #print(gBestArray[maxIndex][1], gBestArray[maxIndex-1][1])
         print("")
     
         #If newpop contains optimum fitness meet condition.
-        for t in range(0, len(population)):
-            if population[t][1] == optimumValue:
-                finish(population[t])
+        if gBest[1] == optimumValue:
+            finish(gBest)
     
         #If maxgenerations met, print closest fitness.
         if i == GENS-1:
-            with open('best solution from each generation.csv', mode='r') as csvFile:
-                csv_reader = csv.reader(csvFile)
-                csvList = list(csv_reader)
+            #Writes data into file for data set testing.
+            with open('data from single run.csv', mode='w', newline='') as csvFile:
+                csvWriter = csv.writer(csvFile, delimiter=',')
+                for k in range(0, len(bestFits)):
+                    csvWriter.writerow([bestFits[k]])
                 csvFile.close()
-            for t in range(0, len(csvList)):
-                csvList[t][1] = int(csvList[t][1])
-                gBestFits.append(csvList[t][1])
-            bestSolutionIndex = np.argmin(np.abs(np.array(gBestFits)-optimumValue))
-            bestSolution = csvList[bestSolutionIndex]
+            
+            bestSolutionIndex = np.argmin(np.abs(np.array(bestFits)-optimumValue))
+            bestSolution = gBestFits[bestSolutionIndex]
             finishGenerations(bestSolution)
          
 def initialization(filename):
@@ -359,7 +362,7 @@ def graphAdaptiveSelection(generationlist, list1, list2, list3):
 def finish(gBest):
     print("Optimum value found!")
     print(gBest)
-    exit()
+    #exit()
 
 def finishGenerations(gBest):
     print("Maximum generations reached!")

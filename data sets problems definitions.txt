@@ -1,0 +1,10 @@
+data set 1 - 2 knaps, 105 obj, 1095445 ov
+data set 2 - 4 knaps, 28 obj, 3418 ov
+data set 3 - 4 knaps, 35 obj, 3186 ov
+data set 4 - 5 knaps, 30 obj, 4554 ov
+data set 5 - 5 knaps, 40 obj, 5557 ov
+data set 6 - 5 knaps, 50 obj, 5643 ov
+data set 7 - 5 knaps, 50 obj, 6159 ov
+data set 8 - 5 knaps, 60 obj, 8633 ov
+data set 9 - 5 knaps, 70 obj, 9580 ov
+data set 10 - 5 knaps, 80 obj, 8947 ov
