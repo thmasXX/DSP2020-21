@@ -315,23 +315,23 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
     
         #If newpop contains optimum fitness meet condition.
         if gBest[1] == optimumValue:
-            with open('data from single run.csv', mode='a', newline='') as csvFile:
-                csvWriter = csv.writer(csvFile, delimiter=',')
-                for k in range(0, len(bestFits)):
-                    csvWriter.writerow([bestFits[k]])
-                csvWriter.writerow([""])
-                csvFile.close()
+##            with open('data from single run.csv', mode='a', newline='') as csvFile:
+##                csvWriter = csv.writer(csvFile, delimiter=',')
+##                for k in range(0, len(bestFits)):
+##                    csvWriter.writerow([bestFits[k]])
+##                csvWriter.writerow([""])
+##                csvFile.close()
             finish(gBest)
     
         #If maxgenerations met, print closest fitness.
         if i == GENS-1:
             #Writes data into file for data set testing.
-            with open('data from single run.csv', mode='a', newline='') as csvFile:
-                csvWriter = csv.writer(csvFile, delimiter=',')
-                for k in range(0, len(bestFits)):
-                    csvWriter.writerow([bestFits[k]])
-                csvWriter.writerow([""])
-                csvFile.close()
+##            with open('data from single run.csv', mode='a', newline='') as csvFile:
+##                csvWriter = csv.writer(csvFile, delimiter=',')
+##                for k in range(0, len(bestFits)):
+##                    csvWriter.writerow([bestFits[k]])
+##                csvWriter.writerow([""])
+##                csvFile.close()
             bestSolutionIndex = np.argmin(np.abs(np.array(bestFits)-optimumValue))
             bestSolution = gBestFits[bestSolutionIndex]
             finishGenerations(bestSolution)
