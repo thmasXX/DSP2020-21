@@ -3,7 +3,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import csv
 import copy
-#Using reals, such as 1.0 and 0.0
+
+def retry():
+    print("")
+    print("Restart program?")
+    retry1 = input("Enter Y/N (case-sensitive): ")
+    if retry1 == "Y":
+        print("")
+        mainmenu()
+    if retry1 == "N":
+        exit()
+    else:
+        print("Enter appropriate value. (Y/N)")
+        retry() 
 
 def calculating_size(sizeArray, particles, n, m):
     particleSizeArray = []
@@ -76,7 +88,8 @@ def repair(particle, particlesize, n, m, capacity, sizeArray):
         for i in range(0, n):
             randomRepair = random.randint(0,m-1)
             if particlesize[i] > capacity[i]:
-                particle[0][i][randomRepair] = 0
+                if sizeArray[i][randomRepair] > 0:
+                    particle[0][i][randomRepair] = 0
         checkIfRepaired = calculating_size(sizeArray, particle[0], n, m)
         if checkIfRepaired <= capacity:
             repaired = True
@@ -85,7 +98,7 @@ def repair(particle, particlesize, n, m, capacity, sizeArray):
 
 def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, sizeArray, capacity, weights, gBestArray):
     #Initialize generations and newGeneration array which replaces population after every generation.
-    GENS = 100
+    GENS = 250
     newpopulation = copy.deepcopy(population)
 
     filename = 'best solution from each generation.csv'
@@ -113,6 +126,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
     totalReward = 0
     mutationRewards = [0,0,0]
 
+    print("")
     print("Optimum Value:", optimumValue)
     print("")
 
@@ -195,10 +209,6 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
         gBest = calculating_gBest(pBest, optimumValue, swarmSize, sizeArray, n, m, capacity)
         data = [gBest[0], gBest[1], gBest[4]]
         gBestFits.append(data)
-##        with open('best solution from each generation.csv', mode='a', newline='') as csvFile:
-##            csvWriter = csv.writer(csvFile, delimiter=',')
-##            csvWriter.writerow(data)
-##            csvFile.close()
 
         data2 = copy.deepcopy(gBest[1])
         bestFits.append(data2)
@@ -212,6 +222,12 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
     
         #If newpop contains optimum fitness meet condition.
         if gBest[1] == optimumValue:
+            with open('data from single run.csv', mode='a', newline='') as csvFile:
+                csvWriter = csv.writer(csvFile, delimiter=',')
+                for k in range(0, len(bestFits)):
+                    csvWriter.writerow([bestFits[k]])
+                csvWriter.writerow([""])
+                csvFile.close()
             finish(gBest)
     
         #If maxgenerations met, print closest fitness.
@@ -346,31 +362,23 @@ def initialization(filename):
     gBestArray.append(gBest)
 
     pso(particleArray, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, finalsizesArray, capacitiesArray, weightsArray, gBestArray)
-
-def graphAdaptiveSelection(generationlist, list1, list2, list3):
-    plt.plot(generationlist, list1)
-    plt.plot(generationlist, list2)
-    plt.plot(generationlist, list3)
-
-    plt.xlabel('Generations')
-    plt.ylabel('Percentage Mutation Chosen')
-
-    plt.title('Adaptive Selection over Generations')
-    plt.show()
     
 
 def finish(gBest):
     print("Optimum value found!")
     print(gBest)
-    #exit()
+    #retry()
+    mainmenu()
 
 def finishGenerations(gBest):
     print("Maximum generations reached!")
     print("Printing best particle...")
     print(gBest)
+    #retry()
+    mainmenu()
 
 def mainmenu():
-    print("PSO with Q-Learning algorithm.")
+    print("PSO algorithm.")
     print("")
     print("Data files are numbered 1-10.")
     dataFileChoice = input("Enter data file number: ")
