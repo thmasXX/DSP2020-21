@@ -314,7 +314,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
 ##                    csvWriter.writerow([bestFits[k]])
 ##                csvWriter.writerow([""])
 ##                csvFile.close()
-            finish(gBest)
+            finish(gBest, QLearning)
     
         #If maxgenerations met, print closest fitness.
         if i == GENS-1:
@@ -327,8 +327,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
 ##                csvFile.close()
             bestSolutionIndex = np.argmin(np.abs(np.array(bestFits)-optimumValue))
             bestSolution = gBestFits[bestSolutionIndex]
-            finishGenerations(bestSolution)
-            #print(QLearning)
+            finishGenerations(bestSolution, QLearning)
          
 def initialization(filename):
     #Read information from text files into variables.
@@ -439,12 +438,12 @@ def initialization(filename):
 
     pso(particleArray, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, finalsizesArray, capacitiesArray, weightsArray, gBestArray)
 
-def finish(gBest):
+def finish(gBest, QLearning):
     print("Optimum value found!")
     print(gBest)
     retry()
 
-def finishGenerations(bestSolution):
+def finishGenerations(bestSolution, QLearning):
     print("Maximum generations reached!")
     print("Printing best particle...")
     print(bestSolution)
