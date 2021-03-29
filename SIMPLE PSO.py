@@ -18,6 +18,7 @@ def retry():
         retry() 
 
 def calculating_size(sizeArray, particles, n, m):
+    #Calculating size of each knapsack.
     particleSizeArray = []
     for j in range(0,n):
         totalParticleSize = 0
@@ -46,6 +47,7 @@ def meeting_capacity(particlesize, particleArray, n, m, capacity, sizeArray):
     return particlesize  
 
 def calculating_fitness(particle, n, m, weights):
+    #Calculate fitness of particle.
     totalFitness = 0
     for i in range(0, n):
         fitness = 0
@@ -56,6 +58,7 @@ def calculating_fitness(particle, n, m, weights):
     return totalFitness
 
 def calculating_gBest(particle, optimumvalue, swarmSize, sizeArray, n, m, capacity):
+    #Calculating gBest of current population.
     differenceArray = []
     for i in range(0,swarmSize):
         differenceArray.append(particle[i][1])
@@ -71,18 +74,15 @@ def calculating_gBest(particle, optimumvalue, swarmSize, sizeArray, n, m, capaci
     return gBest
 
 def comparing_particles(particlefit, optimumValue):
-    #print(particlefit)
-    #print(optimumValue)
-    #particlefitnesses = np.asarray(particlefit)
-    #pBest = (np.abs(particlefitnesses - optimumValue)).argmin()
+    #Comparing two particles to get best solution.
     pBest = min(particlefit, key=lambda x:abs(x-optimumValue))
     for i in range(0,len(particlefit)):
         if pBest == particlefit[i]:
             pBestIndex = i
-    #print(pBestIndex)
     return pBestIndex
 
 def repair(particle, particlesize, n, m, capacity, sizeArray):
+    #Repair function to get within constraints.
     repaired = False
     while repaired == False:
         for i in range(0, n):
@@ -100,10 +100,6 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
     #Initialize generations and newGeneration array which replaces population after every generation.
     GENS = 250
     newpopulation = copy.deepcopy(population)
-
-    filename = 'best solution from each generation.csv'
-    f = open(filename, mode='w+')
-    f.close()
 
     gBestFits = []
     bestFits = []
@@ -130,11 +126,6 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
     print("Optimum Value:", optimumValue)
     print("")
 
-    #print(optimumValue)
-    #for t in range(0,swarmSize):
-        #print(population[t][1])
-    #particle data = 0, fitness = 1, velocity = 2, pos = 3, size = 4
-
     #Until condition has been met, in every generation, we will loop through particles to get
     #solution to be closer to gBest.
     for i in range(0, GENS):
@@ -154,7 +145,19 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                             
                     if gBest[0][rand1][rand2] == 1:
                         #if newpopulation[j][0][rand1][rand2] == 0:
-                        newpopulation[j][0][rand1][rand2] = 1             
+                        newpopulation[j][0][rand1][rand2] = 1
+
+                choice = random.randint(0,n-1)
+                randChoice = random.randint(0,m-1)
+                rate = 0.2
+                prob = random.uniform(0.0, 100.0)
+
+                if prob < (100*rate):
+                    if newpopulation[j][0][choice][randChoice] == 1:
+                        newpopulation[j][0][choice][randChoice] = 0
+                    else:
+                        newpopulation[j][0][choice][randChoice] = 1 
+                    
 
                 #Check whether solution meets capacity.
                 particlesize = calculating_size(sizeArray, newpopulation[j][0], n, m)
@@ -164,7 +167,6 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                 newFitness = calculating_fitness(newpopulation[j][0], n, m, weights)
 
                 if (newFitness >= optimumValue):
-                    #Calculate fitness of new particle.
 
                     #Calculate velocity.
                     random1 = random.uniform(0,1)
@@ -188,7 +190,6 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                     #Get index of value closer to optimum value from new particle and pBest
                     comparingArray = [newFitness, pBest[j][1]]
                     indexpBest = comparing_particles(comparingArray, optimumValue)
-                    #print(indexpBest)
 
                     newpopulation[j][1] =  newFitness
                     
@@ -222,23 +223,24 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
     
         #If newpop contains optimum fitness meet condition.
         if gBest[1] == optimumValue:
-            with open('data from single run.csv', mode='a', newline='') as csvFile:
-                csvWriter = csv.writer(csvFile, delimiter=',')
-                for k in range(0, len(bestFits)):
-                    csvWriter.writerow([bestFits[k]])
-                csvWriter.writerow([""])
-                csvFile.close()
+##            with open('data from single run.csv', mode='a', newline='') as csvFile:
+##                csvWriter = csv.writer(csvFile, delimiter=',')
+##                for k in range(0, len(bestFits)):
+##                    csvWriter.writerow([bestFits[k]])
+##                csvWriter.writerow([""])
+##                csvFile.close()
             finish(gBest)
     
         #If maxgenerations met, print closest fitness.
         if i == GENS-1:
             #Writes data into file for data set testing.
-            with open('data from single run.csv', mode='w', newline='') as csvFile:
-                csvWriter = csv.writer(csvFile, delimiter=',')
-                for k in range(0, len(bestFits)):
-                    csvWriter.writerow([bestFits[k]])
-                csvFile.close()
-            
+##            with open('data from single run.csv', mode='a', newline='') as csvFile:
+##                csvWriter = csv.writer(csvFile, delimiter=',')
+##                for k in range(0, len(bestFits)):
+##                    csvWriter.writerow([bestFits[k]])
+##                csvWriter.writerow([""])
+##                csvFile.close()
+                
             bestSolutionIndex = np.argmin(np.abs(np.array(bestFits)-optimumValue))
             bestSolution = gBestFits[bestSolutionIndex]
             finishGenerations(bestSolution)
@@ -272,7 +274,6 @@ def initialization(filename):
             y = y + m
             
     optimumValue = int(optimumValue)
-    #print(finalsizesArray)
 
     #Create particle tuple containing random 0,1 data dependant on how many knapsacks.
     #Creation of 10 different particles containing random data.
@@ -300,10 +301,6 @@ def initialization(filename):
 
         finalParticleData.append(finalParticle)
 
-    #Output of 1 particle. (Testing)
-    #print(finalParticleData[0])
-    #print(finalParticleData[0][1][3])
-
     #Now, I have a particle array, contiaining 10 elements, within those elements are two knapsacks.
 
     #Calculate original sizes of each particle.
@@ -323,8 +320,6 @@ def initialization(filename):
 
     for i in range(0,swarmSize):
         particleFitnesses.append(calculating_fitness(finalParticleData[i], n, m, weightsArray))
-
-    #print(particleFitnesses)
     
     #Creating velocity/position/pBest and gBest.
     velocity = []
@@ -337,15 +332,11 @@ def initialization(filename):
     for i in range(0,swarmSize):
         pBestParticle = [finalParticleData[i], particleFitnesses[i]]
         pBest.append(pBestParticle)
-
-    #print(pBest)
+        
     #Randomly generate velocities and positions.
     for i in range(0,swarmSize):
         velocity.append(random.uniform(Vmin, Vmax))
         position.append(random.uniform(0.0, 4.0))
-
-    #print(velocities)
-    #print(positions)
 
     #Appending all data to one final array for simple use. (Might not use this).
     particleArray = []
@@ -366,16 +357,24 @@ def initialization(filename):
 
 def finish(gBest):
     print("Optimum value found!")
-    print(gBest)
-    #retry()
-    mainmenu()
+    print("")
+    print("Particle Data: ")
+    for k in range(0, len(gBest[0])):
+        print(gBest[0][k])
+    print("Fitness:", gBest[1])
+    print("Knapsack Sizes:", gBest[4])
+    retry()
 
-def finishGenerations(gBest):
+def finishGenerations(bestSolution):
     print("Maximum generations reached!")
     print("Printing best particle...")
-    print(gBest)
-    #retry()
-    mainmenu()
+    print("")
+    print("Particle Data: ")
+    for k in range(0, len(bestSolution[0])):
+        print(bestSolution[0][k])
+    print("Fitness:", bestSolution[1])
+    print("Knapsack Sizes:", bestSolution[2])
+    retry()
 
 def mainmenu():
     print("PSO algorithm.")

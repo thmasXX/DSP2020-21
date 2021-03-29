@@ -191,8 +191,6 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                 mutate1[1] = calculating_fitness(mutate1[0], n, m, weights)
                 mutate2[1] = calculating_fitness(mutate2[0], n, m, weights)
                 mutate3[1] = calculating_fitness(mutate3[0], n, m, weights)
-
-                #print(mutate1[1], mutate2[1], mutate3[1], newpopulation[j][1])
                 
                 #Find best solution out of mutations
                 findingBestFitnessMutate = [mutate1[1], mutate2[1], mutate3[1]]
@@ -203,8 +201,6 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
                 valueMut2 = [mutate2[0], mutate2[1]]
                 valueMut3 = [mutate3[0], mutate3[1]]
                 valueNP = [newpopulation[j][0], newpopulation[j][1]]
-
-                #print(bestQLearningSol, newpopulation[j][1])
 
                 #Give it a positive/negative reward based on fitness compared to current global best.
                 if bestQLearningSol <= newpopulation[j][1]:
@@ -440,13 +436,23 @@ def initialization(filename):
 
 def finish(gBest, QLearning):
     print("Optimum value found!")
-    print(gBest)
+    print("")
+    print("Particle Data: ")
+    for k in range(0, len(gBest[0])):
+        print(gBest[0][k])
+    print("Fitness:", gBest[1])
+    print("Knapsack Sizes:", gBest[4])
     retry()
 
 def finishGenerations(bestSolution, QLearning):
     print("Maximum generations reached!")
     print("Printing best particle...")
-    print(bestSolution)
+    print("")
+    print("Particle Data: ")
+    for k in range(0, len(bestSolution[0])):
+        print(bestSolution[0][k])
+    print("Fitness:", bestSolution[1])
+    print("Knapsack Sizes:", bestSolution[2])
     retry()
 
 def mainmenu():

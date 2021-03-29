@@ -260,22 +260,23 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
     
         #If newpop contains optimum fitness meet condition.
         if gBest[1] == optimumValue:
-            with open('data from single run.csv', mode='a', newline='') as csvFile:
-                csvWriter = csv.writer(csvFile, delimiter=',')
-                for k in range(0, len(bestFits)):
-                    csvWriter.writerow([bestFits[k]])
-                csvWriter.writerow([""])
-                csvFile.close()
+##            with open('data from single run.csv', mode='a', newline='') as csvFile:
+##                csvWriter = csv.writer(csvFile, delimiter=',')
+##                for k in range(0, len(bestFits)):
+##                    csvWriter.writerow([bestFits[k]])
+##                csvWriter.writerow([""])
+##                csvFile.close()
             finish(gBest)
     
         #If maxgenerations met, print closest fitness.
         if i == GENS-1:
             #Writes data into file for data set testing.
-            with open('data from single run.csv', mode='w', newline='') as csvFile:
-                csvWriter = csv.writer(csvFile, delimiter=',')
-                for k in range(0, len(bestFits)):
-                    csvWriter.writerow([bestFits[k]])
-                csvFile.close()
+##            with open('data from single run.csv', mode='a', newline='') as csvFile:
+##                csvWriter = csv.writer(csvFile, delimiter=',')
+##                for k in range(0, len(bestFits)):
+##                    csvWriter.writerow([bestFits[k]])
+##                csvWriter.writerow([""])
+##                csvFile.close()
             
             bestSolutionIndex = np.argmin(np.abs(np.array(bestFits)-optimumValue))
             bestSolution = gBestFits[bestSolutionIndex]
@@ -356,8 +357,6 @@ def initialization(filename):
 
     for i in range(0,swarmSize):
         particleFitnesses.append(calculating_fitness(finalParticleData[i], n, m, weightsArray))
-
-    #print(particleFitnesses)
     
     #Creating velocity/position/pBest and gBest.
     velocity = []
@@ -394,16 +393,24 @@ def initialization(filename):
 
 def finish(gBest):
     print("Optimum value found!")
-    print(gBest)
-    #retry()
-    mainmenu()
+    print("")
+    print("Particle Data: ")
+    for k in range(0, len(gBest[0])):
+        print(gBest[0][k])
+    print("Fitness:", gBest[1])
+    print("Knapsack Sizes:", gBest[4])
+    retry()
 
-def finishGenerations(gBest):
+def finishGenerations(bestSolution):
     print("Maximum generations reached!")
     print("Printing best particle...")
-    print(gBest)
-    #retry()
-    mainmenu()
+    print("")
+    print("Particle Data: ")
+    for k in range(0, len(bestSolution[0])):
+        print(bestSolution[0][k])
+    print("Fitness:", bestSolution[1])
+    print("Knapsack Sizes:", bestSolution[2])
+    retry()
 
 def mainmenu():
     print("PSO with multiple mutation algorithm.")

@@ -321,7 +321,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
 ##                    csvWriter.writerow([bestFits[k]])
 ##                csvWriter.writerow([""])
 ##                csvFile.close()
-            finish(gBest)
+            finish(gBest, mutationRewards)
     
         #If maxgenerations met, print closest fitness.
         if i == GENS-1:
@@ -334,7 +334,7 @@ def pso(population, pBest, gBest, Vmax, Vmin, optimumValue, swarmSize, n, m, siz
 ##                csvFile.close()
             bestSolutionIndex = np.argmin(np.abs(np.array(bestFits)-optimumValue))
             bestSolution = gBestFits[bestSolutionIndex]
-            finishGenerations(bestSolution)
+            finishGenerations(bestSolution, mutationRewards)
 
         #Function for graph creating for adaptive selection.
         #if i == GENS-1:
@@ -428,7 +428,6 @@ def initialization(filename):
         pBestParticle = [finalParticleData[i], particleFitnesses[i]]
         pBest.append(pBestParticle)
 
-    #print(pBest)
     #Randomly generate velocities and positions.
     for i in range(0,swarmSize):
         velocity.append(random.uniform(Vmin, Vmax))
@@ -461,15 +460,27 @@ def graphAdaptiveSelection(generationlist, list1, list2, list3):
     plt.title('Adaptive Selection over Generations')
     plt.show()
 
-def finish(gBest):
+def finish(gBest, mutationRewards):
     print("Optimum value found!")
-    print(gBest)
+    print("")
+    print("Particle Data: ")
+    for k in range(0, len(gBest[0])):
+        print(gBest[0][k])
+    print("Fitness:", gBest[1])
+    print("Knapsack Sizes:", gBest[4])
+    print("Mutation Credits (in order):", mutationRewards)
     retry()
 
-def finishGenerations(bestSolution):
+def finishGenerations(bestSolution, mutationRewards):
     print("Maximum generations reached!")
     print("Printing best particle...")
-    print(bestSolution)
+    print("")
+    print("Particle Data: ")
+    for k in range(0, len(bestSolution[0])):
+        print(bestSolution[0][k])
+    print("Fitness:", bestSolution[1])
+    print("Knapsack Sizes:", bestSolution[2])
+    print("Mutation Credits (in order):", mutationRewards)
     retry()
 
 def mainmenu():
